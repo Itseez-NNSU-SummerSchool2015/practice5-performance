@@ -1,8 +1,24 @@
+#include <time.h>
+#include <vector>
+#include <stdlib.h>
+#include <stdio.h>
+
 #include "retro_filter.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 
 using namespace std;
 using namespace cv;
+
+// Macros for time measurements
+#if 1
+  #define TS(name) int64 t_##name = getTickCount()
+  #define TE(name) printf("TIMER_" #name ": %.2fms\n", \
+    1000.f * ((getTickCount() - t_##name) / getTickFrequency()))
+#else
+  #define TS(name)
+  #define TE(name)
+#endif
+
 
 inline void alphaBlend(const Mat& src, Mat& dst, const Mat& alpha)
 {
@@ -13,7 +29,8 @@ inline void alphaBlend(const Mat& src, Mat& dst, const Mat& alpha)
 
     multiply(s, w, sw);
     multiply(d, -w, dw);
-    d = (d*255 + sw + dw)/255.0;
+    
+    d += sw / 255.0 + dw / 255.0;
     d.convertTo(dst, CV_8U);
 }
 
@@ -45,12 +62,14 @@ void RetroFilter::applyToVideo(const Mat& frame, Mat& retroFrame)
     int x = rng_.uniform(0, params_.scratches.cols - luminance.cols);
     int y = rng_.uniform(0, params_.scratches.rows - luminance.rows);
 
-    for (row = 0; row < luminance.size().height; row += 1)
+    for (row = 0; row < luminance.size().height; row++)
     {
-        for (col = 0; col < luminance.size().width; col += 1)
+        for (col = 0; col < luminance.size().width; col++)
         {
-            uchar pix_color = params_.scratches.at<uchar>(row + y, col + x) ? (int)scratchColor.at<uchar>(row, col) : luminance.at<uchar>(row, col);
-            luminance.at<uchar>(row, col) = pix_color;
+            if (params_.scratches.at<uchar>(row + y, col + x))
+            {
+                luminance.at<uchar>(row, col) = scratchColor.at<uchar>(row, col);
+            }
         }
     }
 
@@ -58,24 +77,21 @@ void RetroFilter::applyToVideo(const Mat& frame, Mat& retroFrame)
     Mat borderColor(params_.frameSize, CV_32FC1, Scalar::all(meanColor[0] * 1.5));
     alphaBlend(borderColor, luminance, params_.fuzzyBorder);
 
-
     // Apply sepia-effect
     retroFrame.create(luminance.size(), CV_8UC3);
-    Mat hsv_pixel(1, 1, CV_8UC3);
-    Mat rgb_pixel(1, 1, CV_8UC3);
-    for (col = 0; col < luminance.size().width; col += 1)
+    vector<Mat> channels;
+    Mat hsv(luminance.size(), CV_8UC3);
+    split(hsv, channels);
+
+    for (col = 0; col < luminance.size().width; col++)
     {
-        for (row = 0; row < luminance.size().height; row += 1)
+        for (row = 0; row < luminance.size().height; row++)
         {
-            hsv_pixel.ptr()[2] = cv::saturate_cast<uchar>(luminance.at<uchar>(row, col) * hsvScale_ + hsvOffset_);
-            hsv_pixel.ptr()[0] = 19;
-            hsv_pixel.ptr()[1] = 78;
-
-            cvtColor(hsv_pixel, rgb_pixel, CV_HSV2RGB);
-
-            retroFrame.at<Vec3b>(row, col)[0] = rgb_pixel.ptr()[2];
-            retroFrame.at<Vec3b>(row, col)[1] = rgb_pixel.ptr()[1];
-            retroFrame.at<Vec3b>(row, col)[2] = rgb_pixel.ptr()[0];
+            channels[2].at<uchar>(row, col) = cv::saturate_cast<uchar>(luminance.at<uchar>(row, col) * hsvScale_ + hsvOffset_);
+            channels[0].at<uchar>(row, col) = 19;
+            channels[1].at<uchar>(row, col) = 78;
         }
     }
+    merge(channels, retroFrame);
+    cvtColor(retroFrame, retroFrame, CV_HSV2BGR);
 }
