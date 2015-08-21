@@ -46,6 +46,8 @@ void RetroFilter::applyToVideo(const Mat& frame, Mat& retroFrame)
     int x = rng_.uniform(0, params_.scratches.cols - luminance.cols);
     int y = rng_.uniform(0, params_.scratches.rows - luminance.rows);
 
+
+    
     for (row = 0; row < luminance.size().height; row += 1)
     {
         for (col = 0; col < luminance.size().width; col += 1)
@@ -56,6 +58,7 @@ void RetroFilter::applyToVideo(const Mat& frame, Mat& retroFrame)
     }
 
     // Add fuzzy border
+
     Mat borderColor(params_.frameSize, CV_32FC1, Scalar::all(meanColor[0] * 1.5));
     alphaBlend(borderColor, luminance, params_.fuzzyBorder);
 
@@ -64,6 +67,22 @@ void RetroFilter::applyToVideo(const Mat& frame, Mat& retroFrame)
     retroFrame.create(luminance.size(), CV_8UC3);
     Mat hsv_pixel(1, 1, CV_8UC3);
     Mat rgb_pixel(1, 1, CV_8UC3);
+    
+    vector<Mat> hsvSplit;
+    Mat hsvC2 = luminance * hsvScale_  + hsvOffset_;
+    Mat hsvC0 = Mat(luminance.size().height, luminance.size().width,CV_8UC1);
+    hsvC0.setTo(Scalar(19));
+    Mat hsvC1 = Mat(luminance.size().height, luminance.size().width,CV_8UC1);
+    hsvC1.setTo(Scalar(78));
+    hsvSplit.push_back(hsvC0);
+    hsvSplit.push_back(hsvC1);
+    hsvSplit.push_back(hsvC2);
+    Mat hsvMat;
+    merge(hsvSplit, hsvMat);
+    cvtColor(hsvMat,retroFrame,CV_HSV2RGB);
+    
+
+    if(0)
     for (col = 0; col < luminance.size().width; col += 1)
     {
         for (row = 0; row < luminance.size().height; row += 1)

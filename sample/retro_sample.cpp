@@ -97,6 +97,8 @@ int main(int argc, const char** argv)
 
     for(;;)
     {
+        static int counter = 0;
+        counter ++;
         Mat retroFrame;
         TS(filter);
         filter.applyToVideo(frame, retroFrame);

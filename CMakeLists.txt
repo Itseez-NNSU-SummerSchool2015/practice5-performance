@@ -41,10 +41,13 @@ find_package(OpenCV REQUIRED)
 set(LIBRARY_DEPS ${OpenCV_LIBS})
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include" ${OpenCV_INCLUDE_DIRS})
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdparty")
 
 # Add modules
 add_subdirectory(src)
 add_subdirectory(sample)
+add_subdirectory(3rdparty)
+add_subdirectory(test)
 
 # Report generation summary
 message( STATUS "")
