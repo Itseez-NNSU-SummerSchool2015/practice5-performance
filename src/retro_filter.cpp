@@ -39,10 +39,10 @@ void RetroFilter::applyToVideo(const Mat& frame, Mat& retroFrame)
     int col, row;
     Mat luminance;
     cvtColor(frame, luminance, CV_BGR2GRAY);
-
+    int lRows = luminance.rows;
+    int lCols = luminance.cols;
     // Add scratches
     Scalar meanColor = mean(luminance.row(luminance.rows / 2));
-    //Mat scratchColor(params_.frameSize, CV_8UC1, meanColor * 2.0);
     int x = rng_.uniform(0, params_.scratches.cols - luminance.cols);
     int y = rng_.uniform(0, params_.scratches.rows - luminance.rows);
     Mat scratchRoi = params_.scratches(Rect(x,y,luminance.cols,luminance.rows));
@@ -60,16 +60,15 @@ void RetroFilter::applyToVideo(const Mat& frame, Mat& retroFrame)
     Mat hsv_pixel(1, 1, CV_8UC3);
     Mat rgb_pixel(1, 1, CV_8UC3);
     
-    vector<Mat> hsvSplit;
+    //vector<Mat> hsvSplit;
+    Mat hsvSplit[3];
     Mat hsvC2 = luminance * hsvScale_  + hsvOffset_;
-    Mat hsvC0 = Mat(luminance.size().height, luminance.size().width,CV_8UC1);
-    hsvC0.setTo(Scalar(19));
-    Mat hsvC1 = Mat(luminance.size().height, luminance.size().width,CV_8UC1);
-    hsvC1.setTo(Scalar(78));
-    hsvSplit.push_back(hsvC0);
-    hsvSplit.push_back(hsvC1);
-    hsvSplit.push_back(hsvC2);
+    Mat hsvC0 = Mat(lRows, lCols,CV_8UC1, Scalar(19));
+    Mat hsvC1 = Mat(lRows, lCols,CV_8UC1, Scalar(78));
+    hsvSplit[0] = hsvC0;
+    hsvSplit[1] = hsvC1;
+    hsvSplit[2] = hsvC2;
     Mat hsvMat;
-    merge(hsvSplit, hsvMat);
+    merge(hsvSplit,3, hsvMat);
     cvtColor(hsvMat,retroFrame,CV_HSV2BGR);
 }
