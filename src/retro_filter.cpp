@@ -12,9 +12,8 @@ inline void alphaBlend(const Mat& src, Mat& dst, const Mat& alpha)
     src.convertTo(s, CV_32S);
     dst.convertTo(d, CV_32S);
 
-    multiply(s, w, sw);
-    multiply(d, -w, dw);
-    d = (d*255 + sw + dw)/255.0;
+    multiply(s - d, w, sw);
+    d = (d*255 + sw)/255.0;
     d.convertTo(dst, CV_8U);
 }
 
@@ -63,21 +62,12 @@ void RetroFilter::applyToVideo(const Mat& frame, Mat& retroFrame)
 
     // Apply sepia-effect
     retroFrame.create(luminance.size(), CV_8UC3);
-    vector<Mat> channels;
+    vector<Mat> channels; 
     split(retroFrame, channels);
     channels[0] = 19;
     channels[1] = 78;
     channels[2] = luminance * hsvScale_ + hsvOffset_;
     merge(channels, retroFrame);
-    /*for (col = 0; col < luminance.size().width; col++)
-    {
-        for (row = 0; row < luminance.size().height; row++)
-        {
-            retroFrame.at<Vec3b>(row, col)[0] = 19;
-            retroFrame.at<Vec3b>(row, col)[1] = 78;
-            retroFrame.at<Vec3b>(row, col)[2] = cv::saturate_cast<uchar>(luminance.at<uchar>(row, col) * hsvScale_ + hsvOffset_);
-        }
-    }*/
 
     cvtColor(retroFrame, retroFrame, CV_HSV2BGR);
 
