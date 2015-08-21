@@ -21,6 +21,7 @@ class RetroFilter
  private:
     Parameters params_;
     cv::RNG rng_;
+    cv::Mat border_
 
     float hsvScale_;
     float hsvOffset_;
