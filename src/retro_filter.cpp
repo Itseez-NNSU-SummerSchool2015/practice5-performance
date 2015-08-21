@@ -1,9 +1,9 @@
 #include "retro_filter.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
+#include <time.h>
 
 using namespace std;
 using namespace cv;
-#include <time.h> 
 
 inline void alphaBlend(const Mat& src, Mat& dst, const Mat& alpha)
 {
