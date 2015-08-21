@@ -12,15 +12,7 @@
 using namespace std;
 using namespace cv;
 
-// Macros for time measurements
-#if 1
-  #define TS(name) int64 t_##name = getTickCount()
-  #define TE(name) printf("TIMER_" #name ": %.2fms\n", \
-    1000.f * ((getTickCount() - t_##name) / getTickFrequency()))
-#else
-  #define TS(name)
-  #define TE(name)
-#endif
+
 
 const char* params =
      "{ h | help      | false | print usage                                   }"
@@ -97,6 +89,8 @@ int main(int argc, const char** argv)
     params.frameSize   = frame.size();
     RetroFilter filter(params);
 
+    TS(total);
+
     for(;;)
     {
         Mat retroFrame;
@@ -113,6 +107,8 @@ int main(int argc, const char** argv)
         capture >> frame;
         if(frame.empty()) break;
     }
+
+    TE(total);
 
     return 0;
 }
