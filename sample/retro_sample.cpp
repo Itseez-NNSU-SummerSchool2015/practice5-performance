@@ -102,13 +102,8 @@ int main(int argc, const char** argv)
     params.frameSize   = frame.size();
     RetroFilter filter(params);
 
-    for(;;)
+    while (!frame.empty())
     {
-        if(frame.empty()) 
-        {
-            capture >> frame;
-            continue;
-        }
         Mat retroFrame;
         TS(filter);
         filter.applyToVideo(frame, retroFrame);

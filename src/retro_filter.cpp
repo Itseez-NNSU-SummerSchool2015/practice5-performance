@@ -63,7 +63,13 @@ void RetroFilter::applyToVideo(const Mat& frame, Mat& retroFrame)
 
     // Apply sepia-effect
     retroFrame.create(luminance.size(), CV_8UC3);
-    for (col = 0; col < luminance.size().width; col++)
+    vector<Mat> channels;
+    split(retroFrame, channels);
+    channels[0] = 19;
+    channels[1] = 78;
+    channels[2] = luminance * hsvScale_ + hsvOffset_;
+    merge(channels, retroFrame);
+    /*for (col = 0; col < luminance.size().width; col++)
     {
         for (row = 0; row < luminance.size().height; row++)
         {
@@ -71,7 +77,7 @@ void RetroFilter::applyToVideo(const Mat& frame, Mat& retroFrame)
             retroFrame.at<Vec3b>(row, col)[1] = 78;
             retroFrame.at<Vec3b>(row, col)[2] = cv::saturate_cast<uchar>(luminance.at<uchar>(row, col) * hsvScale_ + hsvOffset_);
         }
-    }
+    }*/
 
     cvtColor(retroFrame, retroFrame, CV_HSV2BGR);
 
