@@ -7,7 +7,7 @@ using namespace cv;
 
 static void alphaBlend(const Scalar color, Mat& dst, const Mat& alpha)
 {
-    Mat w, d, dw, sw;
+    Mat w, d, sw;
     alpha.convertTo(w, CV_32S);
     dst.convertTo(d, CV_32S);
     multiply(-d + color, w, sw);
