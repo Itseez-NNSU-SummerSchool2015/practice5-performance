@@ -7,14 +7,14 @@ using namespace cv;
 
 inline void alphaBlend(const Mat& src, Mat& dst, const Mat& alpha)
 {
-    Mat w, d, s, dw, sw;
+    Mat w, d, s, subtr, mult;
     alpha.convertTo(w, CV_32S);
     src.convertTo(s, CV_32S);
     dst.convertTo(d, CV_32S);
 
-    multiply(s, w, sw);
-    multiply(d, -w, dw);
-    d = (d*255 + sw + dw)/255.0;
+	subtract(s,d,subtr);
+	multiply(subtr,w,mult);
+	d = (d*255 + mult)/255.0;
     d.convertTo(dst, CV_8U);
 }
 
