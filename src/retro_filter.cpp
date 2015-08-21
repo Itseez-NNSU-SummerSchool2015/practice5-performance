@@ -3,6 +3,7 @@
 
 using namespace std;
 using namespace cv;
+#include <time.h> 
 
 inline void alphaBlend(const Mat& src, Mat& dst, const Mat& alpha)
 {
