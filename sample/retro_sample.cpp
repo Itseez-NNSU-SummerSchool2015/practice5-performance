@@ -12,15 +12,6 @@
 using namespace std;
 using namespace cv;
 
-// Macros for time measurements
-#if 1
-  #define TS(name) int64 t_##name = getTickCount()
-  #define TE(name) printf("TIMER_" #name ": %.2fms\n", \
-    1000.f * ((getTickCount() - t_##name) / getTickFrequency()))
-#else
-  #define TS(name)
-  #define TE(name)
-#endif
 
 const char* params =
      "{ h | help      | false | print usage                                   }"
@@ -85,20 +76,20 @@ int main(int argc, const char** argv)
     }
 
     Mat frame;
-    capture >> frame;
-    capture >> frame;
+    capture >> frame;	
+	capture >> frame;
 
-    if (frame.empty())
+	if (frame.empty())
     {
         // empty video; lets consider this to be OK
         return 0;
-    }
+    }	    
 
     params.frameSize   = frame.size();
     RetroFilter filter(params);
 
     for(;;)
-    {
+    {		
         Mat retroFrame;
         TS(filter);
         filter.applyToVideo(frame, retroFrame);
@@ -111,7 +102,7 @@ int main(int argc, const char** argv)
             break;
 
         capture >> frame;
-        if(frame.empty()) break;
+		if(frame.empty()) break;        
     }
 
     return 0;
