@@ -18,7 +18,7 @@ inline void alphaBlend(const Mat& src, Mat& dst, const Mat& alpha)
     d.convertTo(dst, CV_8U);
 }
 
-RetroFilter::RetroFilter(const Parameters& params) : rng_(time(0))
+RetroFilter::RetroFilter(const Parameters& params) : rng_(5)
 {
     params_ = params;
 
