@@ -31,6 +31,7 @@ const char* params =
 
 int main(int argc, const char** argv)
 {
+    int flag = 49;
     // Parse command line arguments
     CommandLineParser parser(argc, argv, params);
 
@@ -101,14 +102,23 @@ int main(int argc, const char** argv)
     {
         Mat retroFrame;
         TS(filter);
-        filter.applyToVideo(frame, retroFrame);
+        filter.applyToVideo(frame, retroFrame, flag);
         TE(filter);
 
         imshow("Original Movie", frame);
         imshow("Retro Movie", retroFrame);
         char c = (char) waitKey(1);
-        if( c == 27 ) // Esc
+        switch (c)
+        {
+            case 49: { flag = 49; break; };
+            case 50: { flag = 50; break; };
+            case 51: { flag = 51; break; };
+        }
+
+        if (c == 27) 
+        {
             break;
+        }
 
         capture >> frame;
         if(frame.empty()) break;

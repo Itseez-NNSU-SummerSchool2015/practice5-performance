@@ -16,11 +16,12 @@ class RetroFilter
     RetroFilter(const Parameters& params);
     virtual ~RetroFilter() {};
 
-    void applyToVideo(const cv::Mat& frame, cv::Mat& retroFrame);
+    void applyToVideo(const cv::Mat& frame, cv::Mat& retroFrame, int flag);
 
  private:
     Parameters params_;
     cv::RNG rng_;
+    cv::Mat a,b,c;
 
     float hsvScale_;
     float hsvOffset_;
