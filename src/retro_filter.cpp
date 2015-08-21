@@ -34,7 +34,6 @@ RetroFilter::RetroFilter(const Parameters& params) : rng_(time(0))
     hsvOffset_ = 20;
 }
 
-#include <iostream>
 void RetroFilter::applyToVideo(const Mat& frame, Mat& retroFrame)
 {
     Mat gray;
@@ -48,12 +47,24 @@ void RetroFilter::applyToVideo(const Mat& frame, Mat& retroFrame)
 
     TE(scratching);
 
-    /*// Add fuzzy border
-    Mat borderColor(params_.frameSize, CV_32FC1, Scalar::all(meanColor[0] * 1.5));
-    alphaBlend(borderColor, luminance, params_.fuzzyBorder);
+    // Add fuzzy border
+    int col, row;
+    Mat luminance;
+    cvtColor(frame, luminance, CV_BGR2GRAY);
 
+    Scalar meanColor = mean(luminance.row(luminance.rows / 2));
+    TS(bording);
 
-    // Apply sepia-effect
+    Mat borderColor(params_.frameSize, CV_32FC3, Scalar::all(meanColor[0] * 1.5));
+    Mat tmp;
+    cvtColor(borderColor,tmp,COLOR_BGR2GRAY);
+    addWeighted(gray, 0.5, retroFrame, 0.5, 0.0, retroFrame);
+    resize(params_.fuzzyBorder, tmp, frame.size());
+    addWeighted(tmp, 0.5, retroFrame, 0.5, 0.0, retroFrame);
+
+    TE(bording);
+
+    /*// Apply sepia-effect
     retroFrame.create(luminance.size(), CV_8UC3);
     Mat hsv_pixel(1, 1, CV_8UC3);
     Mat rgb_pixel(1, 1, CV_8UC3);
