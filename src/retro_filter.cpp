@@ -79,7 +79,7 @@ void RetroFilter::applyToVideo(const Mat& frame, Mat& retroFrame)
     hsvSplit.push_back(hsvC2);
     Mat hsvMat;
     merge(hsvSplit, hsvMat);
-    cvtColor(hsvMat,retroFrame,CV_HSV2RGB);
+    cvtColor(hsvMat,retroFrame,CV_HSV2BGR);
     
 
     if(0)
