@@ -85,19 +85,30 @@ int main(int argc, const char** argv)
     }
 
     Mat frame;
-    capture >> frame;
-
-    if (frame.empty())
+    const int maxAttemps = 5; // attempt to get first non-empty frame
+    int attemptIdx = 0;
+    while (frame.empty() && attemptIdx < maxAttemps)
     {
-        // empty video; lets consider this to be OK
-        return 0;
+        capture >> frame;
+        attemptIdx++;
     }
+    if (attemptIdx == maxAttemps)
+    {
+        cout << "Error: empty first frames." << endl;
+        return 1;
+    }
+    
 
     params.frameSize   = frame.size();
     RetroFilter filter(params);
 
     for(;;)
     {
+        if(frame.empty()) 
+        {
+            capture >> frame;
+            continue;
+        }
         Mat retroFrame;
         TS(filter);
         filter.applyToVideo(frame, retroFrame);
@@ -110,7 +121,6 @@ int main(int argc, const char** argv)
             break;
 
         capture >> frame;
-        if(frame.empty()) break;
     }
 
     return 0;
