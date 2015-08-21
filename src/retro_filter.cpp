@@ -45,38 +45,23 @@ void RetroFilter::applyToVideo(const Mat& frame, Mat& retroFrame)
     Mat scratchColor(params_.frameSize, CV_8UC1, meanColor * 2.0);
     int x = rng_.uniform(0, params_.scratches.cols - luminance.cols);
     int y = rng_.uniform(0, params_.scratches.rows - luminance.rows);
-
-    for (row = 0; row < luminance.size().height; row += 1)
-    {
-        for (col = 0; col < luminance.size().width; col += 1)
-        {
-            uchar pix_color = params_.scratches.at<uchar>(row + y, col + x) ? (int)scratchColor.at<uchar>(row, col) : luminance.at<uchar>(row, col);
-            luminance.at<uchar>(row, col) = pix_color;
-        }
-    }
+    luminance.at<uchar>() = params_.scratches.at<uchar>(y, x) ? (int)scratchColor.at<uchar>() : luminance.at<uchar>();
 
     // Add fuzzy border
     Mat borderColor(params_.frameSize, CV_32FC1, Scalar::all(meanColor[0] * 1.5));
     alphaBlend(borderColor, luminance, params_.fuzzyBorder);
-
-
+    
     // Apply sepia-effect
+    
     retroFrame.create(luminance.size(), CV_8UC3);
     Mat hsv_pixel(1, 1, CV_8UC3);
     Mat rgb_pixel(1, 1, CV_8UC3);
-    for (col = 0; col < luminance.size().width; col += 1)
-    {
-        for (row = 0; row < luminance.size().height; row += 1)
-        {
-            hsv_pixel.ptr()[2] = cv::saturate_cast<uchar>(luminance.at<uchar>(row, col) * hsvScale_ + hsvOffset_);
-            hsv_pixel.ptr()[0] = 19;
-            hsv_pixel.ptr()[1] = 78;
+    vector<Mat> hsv_pix(3);
+    hsv_pix[2] = luminance * hsvScale_ + hsvOffset_;
+    hsv_pix[1] = Mat(luminance.size(), CV_8UC1, 19);
+    hsv_pix[0] = Mat(luminance.size(), CV_8UC1, 78);
+    merge(hsv_pix, retroFrame);
+    cvtColor (retroFrame, retroFrame, CV_HSV2RGB);
 
-            cvtColor(hsv_pixel, rgb_pixel, CV_HSV2RGB);
-
-            retroFrame.at<Vec3b>(row, col)[0] = rgb_pixel.ptr()[2];
-            retroFrame.at<Vec3b>(row, col)[1] = rgb_pixel.ptr()[1];
-            retroFrame.at<Vec3b>(row, col)[2] = rgb_pixel.ptr()[0];
-        }
-    }
+    
 }
