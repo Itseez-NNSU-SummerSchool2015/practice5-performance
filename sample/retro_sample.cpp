@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 
+#include "opencv2/opencv.hpp"
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/objdetect/objdetect.hpp"
@@ -59,50 +60,58 @@ int main(int argc, const char** argv)
         return 1;
 
     VideoCapture capture;
-    if (!video_file.empty())
-    {
-        capture.open(video_file);
-        if (!capture.isOpened())
+    {   
+        if (!video_file.empty())
         {
-            cout << "Error: failed to open video stream for: " << video_file << endl;
+            capture.open(video_file);
+            if (!capture.isOpened())
+            {
+                cout << "Error: failed to open video stream for: " << video_file << endl;
+                return 1;
+            }
+        }
+        else if (use_camera)
+        {
+            capture.open(0);
+            if (!capture.isOpened())
+            {
+                cout << "Error: failed to open video stream for camera #0" << endl;
+                return 1;
+            }
+        }
+        else
+        {
+            cout << "Error: declare a source of images" << endl;
+            parser.printParams();
             return 1;
         }
-    }
-    else if (use_camera)
-    {
-        capture.open(0);
-        if (!capture.isOpened())
-        {
-            cout << "Error: failed to open video stream for camera #0" << endl;
-            return 1;
-        }
-    }
-    else
-    {
-        cout << "Error: declare a source of images" << endl;
-        parser.printParams();
-        return 1;
     }
 
     Mat frame;
     capture >> frame;
     capture >> frame;
 
-    if (frame.empty())
+    while (frame.empty())
     {
         // empty video; lets consider this to be OK
-        return 0;
+        //return 0;
+        capture >> frame;
     }
 
     params.frameSize   = frame.size();
     RetroFilter filter(params);
 
+	VideoWriter captur;
+	captur.open("kol.avi",8,1.0/24.0,static_cast<Size>(frame.size()));
+	if(!captur.isOpened()) std::cout<<"not opened";
+
+    long sh=0;
     for(;;)
     {
         Mat retroFrame;
-        TS(filter);
+        //TS(filter);
         filter.applyToVideo(frame, retroFrame);
-        TE(filter);
+        //TE(filter);
 
         imshow("Original Movie", frame);
         imshow("Retro Movie", retroFrame);
@@ -111,7 +120,11 @@ int main(int argc, const char** argv)
             break;
 
         capture >> frame;
+		captur << frame;
         if(frame.empty()) break;
+		if(sh>50) break;
+		sh++;
+		//std::cout<<sh<<"\n";
     }
 
     return 0;

@@ -22,8 +22,6 @@ class RetroFilter
     Parameters params_;
     cv::RNG rng_;
 
-    float hsvScale_;
-    float hsvOffset_;
 };
 
 #endif //__RETRO_FILTER_H__

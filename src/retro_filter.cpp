@@ -30,8 +30,6 @@ RetroFilter::RetroFilter(const Parameters& params) : rng_(time(0))
         resize(params_.scratches, params_.scratches, params_.frameSize);
     }
 
-    hsvScale_ = 1;
-    hsvOffset_ = 20;
 }
 
 void RetroFilter::applyToVideo(const Mat& frame, Mat& retroFrame)
@@ -62,21 +60,28 @@ void RetroFilter::applyToVideo(const Mat& frame, Mat& retroFrame)
 
     // Apply sepia-effect
     retroFrame.create(luminance.size(), CV_8UC3);
-    Mat hsv_pixel(1, 1, CV_8UC3);
-    Mat rgb_pixel(1, 1, CV_8UC3);
+    Mat hsv_image(luminance.size().height, luminance.size().width, CV_8UC3);
+    Mat rgb_image(luminance.size().height, luminance.size().width, CV_8UC3);
+
     for (col = 0; col < luminance.size().width; col += 1)
     {
         for (row = 0; row < luminance.size().height; row += 1)
         {
-            hsv_pixel.ptr()[2] = cv::saturate_cast<uchar>(luminance.at<uchar>(row, col) * hsvScale_ + hsvOffset_);
-            hsv_pixel.ptr()[0] = 19;
-            hsv_pixel.ptr()[1] = 78;
+            hsv_image.ptr(row,col)[0] = 19;
+            hsv_image.ptr(row,col)[1] = 78;
+            hsv_image.ptr(row,col)[2] = cv::saturate_cast<uchar>(luminance.at<uchar>(row, col) + 20);
+        }
+    }
 
-            cvtColor(hsv_pixel, rgb_pixel, CV_HSV2RGB);
+    cvtColor(hsv_image, rgb_image, CV_HSV2RGB);
 
-            retroFrame.at<Vec3b>(row, col)[0] = rgb_pixel.ptr()[2];
-            retroFrame.at<Vec3b>(row, col)[1] = rgb_pixel.ptr()[1];
-            retroFrame.at<Vec3b>(row, col)[2] = rgb_pixel.ptr()[0];
+    for (col = 0; col < luminance.size().width; col += 1)
+    {
+        for (row = 0; row < luminance.size().height; row += 1)
+        {
+        retroFrame.at<Vec3b>(row, col)[0] = rgb_image.ptr(row,col)[2];
+        retroFrame.at<Vec3b>(row, col)[1] = rgb_image.ptr(row,col)[1];
+        retroFrame.at<Vec3b>(row, col)[2] = rgb_image.ptr(row,col)[0];
         }
     }
 }
