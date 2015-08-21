@@ -80,22 +80,4 @@ void RetroFilter::applyToVideo(const Mat& frame, Mat& retroFrame)
     Mat hsvMat;
     merge(hsvSplit, hsvMat);
     cvtColor(hsvMat,retroFrame,CV_HSV2BGR);
-    
-
-    if(0)
-    for (col = 0; col < luminance.size().width; col += 1)
-    {
-        for (row = 0; row < luminance.size().height; row += 1)
-        {
-            hsv_pixel.ptr()[2] = cv::saturate_cast<uchar>(luminance.at<uchar>(row, col) * hsvScale_ + hsvOffset_);
-            hsv_pixel.ptr()[0] = 19;
-            hsv_pixel.ptr()[1] = 78;
-
-            cvtColor(hsv_pixel, rgb_pixel, CV_HSV2RGB);
-
-            retroFrame.at<Vec3b>(row, col)[0] = rgb_pixel.ptr()[2];
-            retroFrame.at<Vec3b>(row, col)[1] = rgb_pixel.ptr()[1];
-            retroFrame.at<Vec3b>(row, col)[2] = rgb_pixel.ptr()[0];
-        }
-    }
 }
