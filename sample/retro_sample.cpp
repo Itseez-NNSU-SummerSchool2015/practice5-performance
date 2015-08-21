@@ -87,10 +87,9 @@ int main(int argc, const char** argv)
     Mat frame;
     capture >> frame;
 
-    if (frame.empty())
+    while (frame.empty())
     {
-        // empty video; lets consider this to be OK
-        return 0;
+        capture >> frame;
     }
 
     params.frameSize   = frame.size();
