@@ -88,17 +88,16 @@ int main(int argc, const char** argv)
     capture >> frame;
     capture >> frame;
 
-    if (frame.empty())
-    {
-        // empty video; lets consider this to be OK
-        return 0;
-    }
-
     params.frameSize   = frame.size();
     RetroFilter filter(params);
 
     for(;;)
     {
+        if(frame.empty())
+        {
+            capture >> frame;
+            continue;
+        }
         Mat retroFrame;
         TS(filter);
         filter.applyToVideo(frame, retroFrame);
@@ -109,9 +108,7 @@ int main(int argc, const char** argv)
         char c = (char) waitKey(1);
         if( c == 27 ) // Esc
             break;
-
         capture >> frame;
-        if(frame.empty()) break;
     }
 
     return 0;
