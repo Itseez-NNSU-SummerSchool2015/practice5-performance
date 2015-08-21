@@ -42,12 +42,13 @@ void RetroFilter::applyToVideo(const Mat& frame, Mat& retroFrame)
 
     // Add scratches
     Scalar meanColor = mean(luminance.row(luminance.rows / 2));
-    Mat scratchColor(params_.frameSize, CV_8UC1, meanColor * 2.0);
+    //Mat scratchColor(params_.frameSize, CV_8UC1, meanColor * 2.0);
     int x = rng_.uniform(0, params_.scratches.cols - luminance.cols);
     int y = rng_.uniform(0, params_.scratches.rows - luminance.rows);
+    Mat scratchRoi = params_.scratches(Rect(x,y,luminance.cols,luminance.rows));
 
-
-    
+    luminance.setTo(meanColor * 2.0, scratchRoi);
+    /*
     for (row = 0; row < luminance.size().height; row += 1)
     {
         for (col = 0; col < luminance.size().width; col += 1)
@@ -55,7 +56,7 @@ void RetroFilter::applyToVideo(const Mat& frame, Mat& retroFrame)
             uchar pix_color = params_.scratches.at<uchar>(row + y, col + x) ? (int)scratchColor.at<uchar>(row, col) : luminance.at<uchar>(row, col);
             luminance.at<uchar>(row, col) = pix_color;
         }
-    }
+    }*/
 
     // Add fuzzy border
 
