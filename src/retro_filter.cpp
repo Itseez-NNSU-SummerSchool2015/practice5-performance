@@ -57,9 +57,7 @@ void RetroFilter::applyToVideo(const Mat& frame, Mat& retroFrame)
 
     // Apply sepia-effect
     retroFrame.create(luminance.size(), CV_8UC3);
-    Mat hsv_pixel(1, 1, CV_8UC3);
-    Mat rgb_pixel(1, 1, CV_8UC3);
-    
+  
     //vector<Mat> hsvSplit;
     Mat hsvSplit[3];
     Mat hsvC2 = luminance * hsvScale_  + hsvOffset_;
