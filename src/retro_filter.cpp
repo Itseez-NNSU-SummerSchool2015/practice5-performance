@@ -58,7 +58,7 @@ void RetroFilter::applyToVideo(const Mat& frame, Mat& retroFrame)
 
     // Add fuzzy border
     Mat borderColor(params_.frameSize, CV_32FC1, Scalar::all(meanColor[0] * 1.5));
-    //alphaBlend(borderColor, luminance, params_.fuzzyBorder);
+    alphaBlend(borderColor, luminance, params_.fuzzyBorder);
 
 
     // Apply sepia-effect
