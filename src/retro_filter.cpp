@@ -64,28 +64,26 @@ void RetroFilter::applyToVideo(const Mat& frame, Mat& retroFrame)
 
     TE(bording);
 
-    /*// Apply sepia-effect
-    retroFrame.create(luminance.size(), CV_8UC3);
-    Mat hsv_pixel(1, 1, CV_8UC3);
-    Mat rgb_pixel(1, 1, CV_8UC3);
+    // Apply sepia-effect
 
     TS(sepia);
 
-    for (col = 0; col < luminance.size().width; col += 1)
-    {
-        for (row = 0; row < luminance.size().height; row += 1)
-        {
-            hsv_pixel.ptr()[2] = cv::saturate_cast<uchar>(luminance.at<uchar>(row, col) * hsvScale_ + hsvOffset_);
-            hsv_pixel.ptr()[0] = 19;
-            hsv_pixel.ptr()[1] = 78;
+    Mat h(retroFrame.size(),CV_8UC1);
+    Mat s(retroFrame.size(),CV_8UC1);
+    Mat v(retroFrame.size(),CV_8UC1);
+    
+    h = Scalar(19);
+    s = Scalar(78);
+    v = retroFrame * hsvScale_ + hsvOffset_;
 
-            cvtColor(hsv_pixel, rgb_pixel, CV_HSV2RGB);
+    std::vector<cv::Mat> array_to_merge;
+    array_to_merge.push_back(h);
+    array_to_merge.push_back(s);
+    array_to_merge.push_back(v);
 
-            retroFrame.at<Vec3b>(row, col)[0] = rgb_pixel.ptr()[2];
-            retroFrame.at<Vec3b>(row, col)[1] = rgb_pixel.ptr()[1];
-            retroFrame.at<Vec3b>(row, col)[2] = rgb_pixel.ptr()[0];
-        }
-    }
+    merge(array_to_merge,retroFrame);
+    cvtColor(retroFrame,retroFrame,COLOR_HSV2BGR);
 
-    TE(sepia);*/
+    TE(sepia);
+
 }
